@@ -1,8 +1,10 @@
 package org.example.orm;
 
+import java.sql.SQLException;
+
 public interface DBContext<E> {
 
-    boolean persist(E entity);
+    boolean persist(E entity) throws IllegalAccessException, SQLException;
 
     Iterable<E> find(Class<E> clazz);
 
