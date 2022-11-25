@@ -20,7 +20,9 @@ public class Main {
         EntityManager<User> userEntityManager = new EntityManager<>(connection);
 
         User user = new User("mario", 22, LocalDate.now());
+        User user2 = new User("kiril", 15, LocalDate.now());
         userEntityManager.persist(user);
+        userEntityManager.persist(user2);
 
     }
 }
