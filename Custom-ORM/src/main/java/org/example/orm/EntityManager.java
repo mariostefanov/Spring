@@ -6,6 +6,7 @@ import org.example.annotations.Id;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,12 +14,48 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EntityManager<E> implements DBContext<E>{
+public class EntityManager<E> implements DBContext<E> {
 
     private final Connection connection;
 
     public EntityManager(Connection connection) {
         this.connection = connection;
+    }
+
+    public void doCreate(Class<E> entityClass) throws SQLException {
+        String tableName = getTableName(entityClass);
+        String fieldsWithTypes = getSQLFieldsWithTypes(entityClass);
+
+        String createQuery = String.format("CREATE TABLE %s (id INT PRIMARY_KEY AUTO_INCREMENT, %s)", tableName, fieldsWithTypes);
+
+        PreparedStatement statement = connection.prepareStatement(createQuery);
+
+        statement.execute();
+    }
+
+    private String getSQLFieldsWithTypes(Class<E> entityClass) {
+
+        return Arrays.stream(entityClass.getDeclaredFields())
+                .filter(f -> !f.isAnnotationPresent(Id.class))
+                .filter(f -> f.isAnnotationPresent(Column.class))
+                .map(field -> {
+                    String fieldName = field.getAnnotationsByType(Column.class)[0].name();
+                    Class<?> type = field.getType();
+
+                    String sqlType = "";
+
+                    if (type == Integer.class || type == int.class) {
+                        sqlType = "INT";
+                    } else if (type == String.class) {
+                        sqlType = "VARCHAR(200)";
+                    } else if (type == LocalDate.class) {
+                        sqlType = "DATE";
+                    }
+
+                    return fieldName + " " + sqlType;
+                }).collect(Collectors.joining(", "));
+
+
     }
 
     @Override
@@ -27,8 +64,8 @@ public class EntityManager<E> implements DBContext<E>{
         primaryKey.setAccessible(true);
         Object idValue = primaryKey.get(entity);
 
-        if (idValue == null || (long) idValue<=0){
-            return doInsert(entity,primaryKey);
+        if (idValue == null || (long) idValue <= 0) {
+            return doInsert(entity, primaryKey);
         }
 
         //return doUpdate();
@@ -36,7 +73,15 @@ public class EntityManager<E> implements DBContext<E>{
         return false;
     }
 
-    private boolean doInsert(E entity,Field idColumn) throws IllegalAccessException, SQLException {
+    private boolean doUpdate(E entity) throws IllegalAccessException {
+        String tableName = getTableName(entity.getClass());
+        String tablesFields = getColumnsWithoutId(entity.getClass());
+        String columnsValues = getColumnsValuesWithoutId(entity);
+
+        return false;
+    }
+
+    private boolean doInsert(E entity, Field idColumn) throws IllegalAccessException, SQLException {
 
 
         String tableName = getTableName(entity.getClass());
@@ -83,7 +128,7 @@ public class EntityManager<E> implements DBContext<E>{
     private String getTableName(Class<?> aClass) {
         Entity[] annotationsByType = aClass.getAnnotationsByType(Entity.class);
 
-        if (annotationsByType.length == 0){
+        if (annotationsByType.length == 0) {
             throw new UnsupportedOperationException("Class must be Entity");
         }
 
@@ -110,7 +155,7 @@ public class EntityManager<E> implements DBContext<E>{
         return null;
     }
 
-    private Field getId(Class<?> clazz){
+    private Field getId(Class<?> clazz) {
 
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(Id.class))
