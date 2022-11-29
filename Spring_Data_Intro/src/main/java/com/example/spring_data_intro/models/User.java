@@ -3,7 +3,6 @@ package com.example.spring_data_intro.models;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity(name = "users")
