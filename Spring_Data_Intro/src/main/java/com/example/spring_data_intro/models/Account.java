@@ -14,10 +14,14 @@ public class Account {
     @Column(nullable = false)
     private BigDecimal balance;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = User.class)
     private User user;
 
     public Account() {
+    }
+
+    public Account(BigDecimal balance) {
+        this.balance = balance;
     }
 
     public Account(BigDecimal balance, User user) {

@@ -17,10 +17,16 @@ public class User {
 
     private int age;
 
-    @OneToMany(targetEntity = Account.class,mappedBy = "users")
+    @OneToMany(targetEntity = Account.class,mappedBy = "user")
     private Set<Account> accounts;
 
     public User() {
+        this.accounts = new HashSet<>();
+    }
+
+    public User(String username, int age) {
+        this.username = username;
+        this.age = age;
         this.accounts = new HashSet<>();
     }
 
