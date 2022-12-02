@@ -2,6 +2,7 @@ package com.example.spring_data_intro.models;
 
 import jakarta.persistence.*;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,9 +26,9 @@ public class User {
     }
 
     public User(String username, int age) {
+        this();
         this.username = username;
         this.age = age;
-        this.accounts = new HashSet<>();
     }
 
     public long getId() {
@@ -58,7 +59,7 @@ public class User {
     }
 
     public Set<Account> getAccounts() {
-        return accounts;
+        return Collections.unmodifiableSet(accounts);
     }
 
     public User setAccounts(Set<Account> accounts) {
