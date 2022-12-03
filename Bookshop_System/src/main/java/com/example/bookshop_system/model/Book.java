@@ -28,6 +28,9 @@ public class Book {
     private BigDecimal price;
 
     @Column(nullable = false)
+    private int copies;
+
+    @Column(nullable = false)
     private LocalDate releaseDate;
 
     @Column(nullable = false)
@@ -42,14 +45,15 @@ public class Book {
     public Book() {
     }
 
-    public Book(String title, String description, EditionType editionType, BigDecimal price, LocalDate releaseDate, AgeRestriction ageRestriction, Author author) {
+    public Book(String title, EditionType editionType, BigDecimal price, int copies, LocalDate releaseDate, AgeRestriction ageRestriction, Author author, Set<Category> categories) {
         this.title = title;
-        this.description = description;
         this.editionType = editionType;
         this.price = price;
+        this.copies = copies;
         this.releaseDate = releaseDate;
         this.ageRestriction = ageRestriction;
         this.author = author;
+        this.categories = categories;
     }
 
     public Long getId() {
@@ -94,6 +98,15 @@ public class Book {
 
     public Book setPrice(BigDecimal price) {
         this.price = price;
+        return this;
+    }
+
+    public int getCopies() {
+        return copies;
+    }
+
+    public Book setCopies(int copies) {
+        this.copies = copies;
         return this;
     }
 
