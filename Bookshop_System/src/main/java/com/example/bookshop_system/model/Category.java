@@ -15,9 +15,6 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(targetEntity = Book.class)
-    private Set<Book> books;
-
     public Category() {
     }
 
@@ -40,15 +37,6 @@ public class Category {
 
     public Category setName(String name) {
         this.name = name;
-        return this;
-    }
-
-    public Set<Book> getBooks() {
-        return books;
-    }
-
-    public Category setBooks(Set<Book> books) {
-        this.books = books;
         return this;
     }
 }

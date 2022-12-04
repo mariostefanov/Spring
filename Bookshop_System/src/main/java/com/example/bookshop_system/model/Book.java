@@ -39,7 +39,7 @@ public class Book {
     @ManyToOne(targetEntity = Author.class)
     private Author author;
 
-    @ManyToMany(targetEntity = Category.class,mappedBy = "books")
+    @ManyToMany
     Set<Category> categories;
 
     public Book() {
