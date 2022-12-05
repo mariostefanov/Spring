@@ -29,7 +29,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         for (int i = 0; i < categoriesCount; i++) {
             long nextId = random.nextInt((int) size) + 1;
-
             categoriesIds.add(nextId);
         }
 

@@ -2,6 +2,8 @@ package com.example.bookshop_system.model;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "authors")
 public class Author {
@@ -14,6 +16,9 @@ public class Author {
 
     @Column(nullable = false)
     private String lastName;
+
+    @OneToMany(targetEntity = Book.class, mappedBy = "author", fetch = FetchType.EAGER)
+    private Set<Book> books;
 
     public Author() {
     }
@@ -47,6 +52,15 @@ public class Author {
 
     public Author setLastName(String lastName) {
         this.lastName = lastName;
+        return this;
+    }
+
+    public Set<Book> getBooks() {
+        return books;
+    }
+
+    public Author setBooks(Set<Book> books) {
+        this.books = books;
         return this;
     }
 }
