@@ -1,7 +1,6 @@
 package com.example.bookshop_system.repositories;
 
 import com.example.bookshop_system.model.Author;
-import com.example.bookshop_system.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +11,9 @@ import java.util.List;
 public interface AuthorRepository extends JpaRepository<Author,Long> {
     List<Author> findByBooksReleaseDateBefore(LocalDate localDate);
 
-    List<Book>  findAllBooksByFirstNameAndLastNameOrderByBooksReleaseDateDescBooksTitle(String firstName, String lastName);
+    List<Author>  findAllBooksByFirstNameAndLastNameOrderByBooksReleaseDateDescBooksTitle(String firstName, String lastName);
+
+    List<Author> findByFirstNameEndsWith(String str);
+
 
 }

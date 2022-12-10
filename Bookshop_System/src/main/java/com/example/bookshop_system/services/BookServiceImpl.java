@@ -1,7 +1,9 @@
 package com.example.bookshop_system.services;
 
 
+import com.example.bookshop_system.model.AuthorNamesWithTotalCopies;
 import com.example.bookshop_system.model.Book;
+import com.example.bookshop_system.model.BookSummary;
 import com.example.bookshop_system.model.enums.AgeRestriction;
 import com.example.bookshop_system.model.enums.EditionType;
 import com.example.bookshop_system.repositories.BookRepository;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -64,4 +67,45 @@ public class BookServiceImpl implements BookService {
 
         books.forEach(book -> System.out.println(book.getTitle()+ " - " + book.getEditionType() + " - " + book.getPrice()));
     }
+
+    @Override
+    public void printBookTitlesContaining(String str) {
+        List<Book> titles = bookRepository.findBookTitleByTitleContainingIgnoreCase(str);
+        titles.forEach(book -> System.out.println(book.getTitle()));
+    }
+
+    @Override
+    public void printAllTitleByAuthorLastNameStarts(String str) {
+        List<Book> books = bookRepository.findAllByAuthorLastNameStartsWith(str);
+
+        books.forEach(book -> System.out.println(book.getTitle()));
+    }
+
+    @Override
+    public void printBooksTitlesLongerThan(int n) {
+        Integer count = bookRepository.bookCountByTitleLongerThan(n);
+
+        System.out.println(count);
+    }
+
+    @Override
+    public void printCopiesByAuthor(String firstName, String lastName) {
+        List<AuthorNamesWithTotalCopies> namesAndTotalCopies = bookRepository.findCopiesByAuthorFirstNameAndAuthorLastName(firstName, lastName);
+        System.out.println();
+        namesAndTotalCopies.forEach(n -> System.out.println(n.getFirstName() + " " + n.getLastName() + " " + n.getTotalCopies()));
+    }
+
+    @Override
+    public List<BookSummary> findBookInfoByTitle(String title) {
+        return bookRepository.findBookInfoByTitle(title);
+    }
+
+    @Override
+    public long increaseBookCopiesAfterDate(String date, int amount) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
+        LocalDate after = LocalDate.parse(date, formatter);
+        return this.bookRepository.increaseBookCopiesAfterDate(after,amount);
+    }
+
+
 }

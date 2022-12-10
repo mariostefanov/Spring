@@ -10,4 +10,6 @@ public interface AuthorService {
     void printAuthorsOrderedByBooksCount();
 
     void printGeorgePowellBookOrdered();
+
+    void printFirstNamesEndsWith(String str);
 }
