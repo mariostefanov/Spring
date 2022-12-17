@@ -1,6 +1,7 @@
 package exam.model.dto;
 
-import javax.validation.constraints.Size;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -14,24 +15,26 @@ public class ImportShopDTO {
     private String address;
 
     @XmlElement(name = "employee-count")
-    @Size(min = 1,max = 50)
+    @Min(1)
+    @Max(50)
     private int employeeCount;
 
     @XmlElement
-    @Size(min = 20000)
+    @Min(20000)
+    @NotNull
     private BigDecimal income;
 
     @XmlElement
     @Size(min = 4)
+    @NotEmpty
     private String name;
 
     @XmlElement(name = "shop-area")
-    @Size(min = 150)
+    @Min(150)
     private int shopAria;
 
-    @XmlElement
-    @Size(min = 2)
-    private String townName;
+    @XmlElement(name = "town")
+    private ImportTownNameDto townNameDto;
 
     public ImportShopDTO() {
     }
@@ -56,7 +59,7 @@ public class ImportShopDTO {
         return shopAria;
     }
 
-    public String getTownName() {
-        return townName;
+    public ImportTownNameDto getTownNameDto() {
+        return townNameDto;
     }
 }

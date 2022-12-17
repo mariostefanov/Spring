@@ -35,7 +35,8 @@ o	(Larger than or equal to 1 and less than or equal to 50).
     @Column(name = "shop_area",nullable = false)
     private int shopArea;
 
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.ALL)
     private Town town;
 
 
@@ -113,5 +114,23 @@ o	(Larger than or equal to 1 and less than or equal to 50).
     public Shop setTown(Town town) {
         this.town = town;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Shop shop = (Shop) o;
+
+        if (id != shop.id) return false;
+        return name.equals(shop.name);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + name.hashCode();
+        return result;
     }
 }

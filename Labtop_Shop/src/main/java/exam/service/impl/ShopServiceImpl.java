@@ -1,14 +1,17 @@
 package exam.service.impl;
 
 import exam.model.Shop;
+import exam.model.Town;
 import exam.model.dto.ImportShopDTO;
 import exam.model.dto.ImportShopsDTO;
 import exam.repository.ShopRepository;
+import exam.repository.TownRepository;
 import exam.service.ShopService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -31,13 +34,14 @@ public class ShopServiceImpl implements ShopService {
     private final ModelMapper modelMapper;
     private final Validator validator;
     private final Unmarshaller unmarshaller;
-    private final JAXBContext context;
+    private final TownRepository townRepository;
 
-    public ShopServiceImpl(ShopRepository shopRepository, Validator validator) throws JAXBException {
+    public ShopServiceImpl(ShopRepository shopRepository, TownRepository townRepository) throws JAXBException {
         this.shopRepository = shopRepository;
+        this.townRepository = townRepository;
         this.modelMapper = new ModelMapper();
-        this.validator = validator;
-        this.context = JAXBContext.newInstance(ImportShopsDTO.class);
+        this.validator = Validation.buildDefaultValidatorFactory().getValidator();
+        JAXBContext context = JAXBContext.newInstance(ImportShopsDTO.class);
         this.unmarshaller = context.createUnmarshaller();
     }
 
@@ -53,10 +57,14 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public String importShops() throws JAXBException, FileNotFoundException {
-        ImportShopsDTO shops = (ImportShopsDTO) unmarshaller.unmarshal(new FileReader(xmlPath.toAbsolutePath().toString()));
+        ImportShopsDTO shops =
+                (ImportShopsDTO) unmarshaller.unmarshal(new FileReader(xmlPath.toAbsolutePath().toString()));
 
-        shops.getShops().stream().map(this::importShop);
-        return null;
+        return shops
+                .getShops()
+                .stream()
+                .map(this::importShop)
+                .collect(Collectors.joining("\n"));
     }
 
     private String importShop(ImportShopDTO importShopDTO) {
@@ -64,6 +72,13 @@ public class ShopServiceImpl implements ShopService {
                 validator.validate(importShopDTO);
 
         if (!violations.isEmpty()){
+            return "Invalid Shop1";
+        }
+
+        String townByName = importShopDTO.getTownNameDto().getName();
+        Optional<Town> townOpt = this.townRepository.findByName(townByName);
+
+        if (townOpt.isEmpty()) {
             return "Invalid Shop";
         }
 
@@ -74,17 +89,20 @@ public class ShopServiceImpl implements ShopService {
                         importShopDTO.getIncome(),
                         importShopDTO.getName(),
                         importShopDTO.getShopAria(),
-                        importShopDTO.getTownName()
+                        townOpt.get().getName()
                         );
 
         if (shopOpt.isPresent()){
-            return "Invalid Shop";
+            return "Invalid Shop2";
         }
 
         Shop shop = this.modelMapper.map(importShopDTO, Shop.class);
+        shop.setTown(this.townRepository.findByName(townByName).get());
+
+//        if (shopRepository.findByName(shop.getName()).isPresent())
+//            return "Invalid Town";
 
         shopRepository.save(shop);
-
-        return "Successfully imported Shop " + shop;
+        return "Successfully imported Shop " + shop.getName();
     }
 }
